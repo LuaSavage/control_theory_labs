@@ -40,23 +40,39 @@ P_1_b
 ## Решение дискретного уравнения Ляпунова
 P = sdpvar(3,3);
 ## ограничения
-F = [A'*P*A-P+Q >= 0];
-F = F + [trace(P) == 1];
+F = [A'*P*A-P+Q <= 0];
+##F = F + [trace(P) == 1];
 optimize(F, trace(P));
-P_sol = double(P);
-P_sol
+P_dlyap_sol = double(P);
+P_dlyap_sol
 
 %%% уравнения Риккати
-R=1
+R=1;
 B = [0;-7.4;0];
 
 %% A
-place (A, B, p);
-#care(A,B,Q);
+%% Непрерывное
+%%A'*P + P*A - P*B*(R^(-1))*B'*P + Q 
+care_sol = care(A,B,Q,R);
+care_sol
+##F = [(A'*P)*(-1) - P*A + P*B*(R^(-1))*B'*P - Q  <= 0];
+F = [A'*P + P*A - P*B*(R^(-1))*B'*P + Q  >= 0];
+F = F + [P>=0];
+#optimize(F, trace(P)*(-1));
+#P_care_sol = double(P);
+#P_care_sol
 
+%% Дискретное
 %% B
 dare_res = dare(A,B,Q,R);
 dare_res
+
+%%A'*P*A - P - A'*P*B * ((R+B'*P*B)^(-1)) * B'*P*A + Q
+F = [A'*P*A - P - A'*P*B * ((R+B'*P*B)^(-1)) * B'*P*A + Q  >= 0];
+F = F + [P>=0];
+optimize(F, trace(P)*(-1));
+P_dare_sol = double(P);
+P_dare_sol
 
 
 
